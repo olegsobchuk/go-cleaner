@@ -1,2 +1,0 @@
-test/qwe.lnk
-test/so/asd/213.Lnk
