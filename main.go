@@ -14,14 +14,18 @@ import (
 const dumpFilePath = "./dump_file.txt"
 
 var (
-	dumpFile    *os.File
-	realClean   bool
-	folderCount uint16
-	fileCount   uint16
+	dumpFile     *os.File
+	folderCount  uint16
+	fileCount    uint16
+	removedCount uint16
+	foundCount   uint16
+	startPath    string
+	realClean    bool
 )
 
 func main() {
 	flag.BoolVar(&realClean, "real", false, "is it real clean or simulate. true if real")
+	flag.StringVar(&startPath, "path", ".", "path for start")
 	flag.Parse()
 
 	if !realClean {
@@ -37,7 +41,7 @@ func main() {
 	fmt.Printf("Real mode %t \n", realClean)
 
 	fmt.Println("--->> Go...")
-	checkAndRemove(".")
+	checkAndRemove(startPath)
 	fmt.Println("<<--- Finished")
 	printStats()
 	presentation()
@@ -74,7 +78,9 @@ func checkAndRemove(dirPath string) {
 					fmt.Println(err)
 					continue
 				}
+				removedCount++
 			} else {
+				foundCount++
 				_, err = dumpFile.WriteString(fmt.Sprintf("%s\n", newPath))
 				if err != nil {
 					log.Println("Write to file error:", err)
@@ -101,5 +107,10 @@ func presentation() {
 }
 
 func printStats() {
-	fmt.Printf("\nChecked: %d folder(s), %d file(s)\n\n", folderCount, fileCount)
+	fmt.Printf("\nChecked: %d folder(s), %d file(s)\n", folderCount, fileCount)
+	if realClean {
+		fmt.Printf("\nRemoved: %d file(s)\n\n", removedCount)
+	} else {
+		fmt.Printf("\nFound: %d file(s)\n\n", foundCount)
+	}
 }
