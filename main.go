@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -19,18 +18,17 @@ var (
 	fileCount    uint16
 	removedCount uint16
 	foundCount   uint16
-	startPath    string
-	realClean    bool
 )
 
 func main() {
-	flag.BoolVar(&realClean, "real", false, "is it real clean or simulate. true if real")
-	flag.StringVar(&startPath, "path", ".", "path for start")
-	flag.Parse()
-
 	SetConfiguration()
 
-	if !realClean {
+	if !config.IsReady {
+		fmt.Println("Not ready, check config file")
+		return
+	}
+
+	if !config.RealClean {
 		var err error
 		dumpFile, err = os.Create(dumpFilePath)
 		if err != nil {
@@ -40,10 +38,10 @@ func main() {
 		defer dumpFile.Sync()
 	}
 
-	fmt.Printf("Real mode %t \n", realClean)
+	fmt.Printf("Real mode %t \n", config.RealClean)
 
 	fmt.Println("--->> Go...")
-	checkAndRemove(startPath)
+	checkAndRemove(config.StartPath)
 	fmt.Println("<<--- Finished")
 	printStats()
 	presentation()
@@ -74,7 +72,7 @@ func checkAndRemove(dirPath string) {
 		ext := extension(entry.Name())
 
 		if slices.Contains(supportedExtensions(), ext) {
-			if realClean {
+			if config.RealClean {
 				err := os.Remove(newPath)
 				if err != nil {
 					fmt.Println(err)
@@ -101,18 +99,4 @@ func extension(fileName string) string {
 	ext := filepath.Ext(fileName)
 	ext = strings.TrimPrefix(ext, ".")
 	return strings.ToLower(ext)
-}
-
-func presentation() {
-	text := `Version: 0.0.3 * Developped by Oleh Sobchuk tel: 0730240643`
-	fmt.Println(text)
-}
-
-func printStats() {
-	fmt.Printf("\nChecked: %d folder(s), %d file(s)\n", folderCount, fileCount)
-	if realClean {
-		fmt.Printf("\nRemoved: %d file(s)\n\n", removedCount)
-	} else {
-		fmt.Printf("\nFound: %d file(s)\n\n", foundCount)
-	}
 }

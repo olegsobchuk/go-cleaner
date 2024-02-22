@@ -10,14 +10,17 @@ import (
 
 const confFileName = "cleaner_config.yml"
 
+var config Config
+
 type Config struct {
 	StartPath string `yaml:"path"`
 	RealClean bool   `yaml:"real"`
+	IsReady   bool   `yaml:"ready"`
 }
 
 func SetConfiguration() {
 	if isConfExist() {
-		// read conf
+		readConfFile()
 	} else {
 		addConfigFile()
 	}
@@ -29,22 +32,31 @@ func addConfigFile() {
 		fmt.Println("Create config error:", err)
 	}
 	defer confFile.Close()
-	conf := defaultConf()
-	data, err := yaml.Marshal(conf)
+	setDefaultConf()
+	data, err := yaml.Marshal(config)
 	if err != nil {
 		fmt.Println("YAML Marshaling err:", err)
 	}
 	confFile.Write(data)
 }
 
-func defaultConf() Config {
-	return Config{
+func setDefaultConf() {
+	config = Config{
 		StartPath: ".",
 		RealClean: false,
+		IsReady:   false,
 	}
 }
 
 func isConfExist() bool {
 	_, err := os.Stat(confFileName)
 	return !errors.Is(err, os.ErrNotExist)
+}
+
+func readConfFile() {
+	data, err := os.ReadFile(confFileName)
+	if err != nil {
+		fmt.Println("Read conf file err:", err)
+	}
+	yaml.Unmarshal(data, &config)
 }
