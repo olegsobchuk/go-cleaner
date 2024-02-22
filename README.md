@@ -8,13 +8,13 @@ env GOOS=windows GOARCH=amd64 go build -o cleaner.exe
 
 ## How to use
 
-First run it creates `cleaner_config.yml` file with default parameters.
+On first run it creates `cleaner_config.yml` file with default parameters.
 You can change any, but service wont go futher without this config.
 
-### Config attrebutes
+### Config attributes
 
 |Value|Type|Description|
 |-|-|-|
+|`ready`|boolean|if `false` it doesn't start to avoid unconfigurable run|
+|`real`|boolean|on `false` it just analizes and builds `dump_file.txt` with results, if `true` it removes files|
 |`path`|string|path to folder for checking|
-|`real`|boolean|if `true` it removes files, if `false` - just analize and builds `dump_file.txt` with results|
-|`ready`|boolean|if `false` it doesn't start, if `true` goes futher|
