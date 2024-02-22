@@ -28,6 +28,8 @@ func main() {
 	flag.StringVar(&startPath, "path", ".", "path for start")
 	flag.Parse()
 
+	SetConfiguration()
+
 	if !realClean {
 		var err error
 		dumpFile, err = os.Create(dumpFilePath)
