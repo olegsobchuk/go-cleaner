@@ -43,10 +43,6 @@ func main() {
 	presentation()
 }
 
-func supportedExtensions() []string {
-	return []string{"lnk"}
-}
-
 func checkAndRemove(dirPath string) {
 	stats.FolderChecked++
 	entries, err := os.ReadDir(dirPath)
@@ -67,7 +63,7 @@ func checkAndRemove(dirPath string) {
 		stats.FileChecked++
 		ext := extension(entry.Name())
 
-		if slices.Contains(supportedExtensions(), ext) {
+		if slices.Contains(config.Exts, ext) {
 			if config.RealClean {
 				err := os.Remove(newPath)
 				if err != nil {

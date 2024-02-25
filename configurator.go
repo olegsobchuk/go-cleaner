@@ -13,9 +13,11 @@ const confFileName = "cleaner_config.yml"
 var config Config
 
 type Config struct {
-	StartPath string `yaml:"path"`
-	RealClean bool   `yaml:"real"`
-	IsReady   bool   `yaml:"ready"`
+	StartPath string   `yaml:"path"`
+	RealClean bool     `yaml:"real"`
+	IsReady   bool     `yaml:"ready"`
+	Exts      []string `yaml:"extensions"`
+	FileNames []string `yaml:"files"`
 }
 
 func SetConfiguration() {
@@ -45,6 +47,8 @@ func setDefaultConf() {
 		StartPath: ".",
 		RealClean: false,
 		IsReady:   false,
+		FileNames: []string{"~.ini"},
+		Exts:      []string{"lnk"},
 	}
 }
 
