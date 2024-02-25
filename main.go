@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"path"
@@ -61,9 +62,8 @@ func checkAndRemove(dirPath string) {
 		}
 
 		stats.FileChecked++
-		ext := extension(entry.Name())
 
-		if slices.Contains(config.Exts, ext) {
+		if isSuspicious(entry) {
 			if config.RealClean {
 				err := os.Remove(newPath)
 				if err != nil {
@@ -85,6 +85,11 @@ func checkAndRemove(dirPath string) {
 			fmt.Printf("   XXX: %s \n", entry.Name())
 		}
 	}
+}
+
+func isSuspicious(file fs.DirEntry) bool {
+	ext := extension(file.Name())
+	return slices.Contains(config.Exts, ext)
 }
 
 func extension(fileName string) string {
