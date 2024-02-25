@@ -13,11 +13,7 @@ import (
 const dumpFilePath = "./dump_file.txt"
 
 var (
-	dumpFile     *os.File
-	folderCount  uint16
-	fileCount    uint16
-	removedCount uint16
-	foundCount   uint16
+	dumpFile *os.File
 )
 
 func main() {
@@ -52,7 +48,7 @@ func supportedExtensions() []string {
 }
 
 func checkAndRemove(dirPath string) {
-	folderCount++
+	stats.FolderChecked++
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
 		fmt.Println(err)
@@ -68,7 +64,7 @@ func checkAndRemove(dirPath string) {
 			continue
 		}
 
-		fileCount++
+		stats.FileChecked++
 		ext := extension(entry.Name())
 
 		if slices.Contains(supportedExtensions(), ext) {
@@ -78,9 +74,9 @@ func checkAndRemove(dirPath string) {
 					fmt.Println(err)
 					continue
 				}
-				removedCount++
+				stats.RemovedCount++
 			} else {
-				foundCount++
+				stats.FoundCount++
 				_, err = dumpFile.WriteString(fmt.Sprintf("%s\n", newPath))
 				if err != nil {
 					log.Println("Write to file error:", err)
