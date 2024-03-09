@@ -1,8 +1,8 @@
 package main
 
-import "fmt"
+import "log"
 
-const version = "1.0.2"
+const version = "1.1.0"
 
 var stats Stats
 
@@ -15,14 +15,14 @@ type Stats struct {
 
 func presentation() {
 	text := "Version: %s * Developped by Oleh Sobchuk tel: 0730240643\n"
-	fmt.Printf(text, version)
+	log.Printf(text, version)
 }
 
-func printStats() {
-	fmt.Printf("\nChecked: %d folder(s), %d file(s)\n", stats.FileChecked, stats.FileChecked)
-	if config.RealClean {
-		fmt.Printf("\nRemoved: %d file(s)\n\n", stats.RemovedCount)
+func printStats(realClean bool) {
+	log.Printf("\nChecked: %d folder(s), %d file(s)\n", stats.FileChecked, stats.FileChecked)
+	if realClean {
+		log.Printf("\nRemoved: %d file(s)\n\n", stats.RemovedCount)
 	} else {
-		fmt.Printf("\nFound: %d file(s)\n\n", stats.FoundCount)
+		log.Printf("\nFound: %d file(s)\n\n", stats.FoundCount)
 	}
 }
