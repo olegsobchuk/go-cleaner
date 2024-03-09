@@ -21,7 +21,7 @@ func main() {
 	SetConfiguration()
 
 	if !config.IsReady {
-		fmt.Println("Not ready, check config file")
+		log.Println("Not ready, check config file")
 		return
 	}
 
@@ -35,21 +35,24 @@ func main() {
 		defer dumpFile.Sync()
 	}
 
-	fmt.Printf("Real mode %t \n", config.RealClean)
+	log.Printf("Real mode %t \n", config.RealClean)
 
-	fmt.Println("--->> Go...")
-	checkAndRemove(config.StartPath)
-	fmt.Println("<<--- Finished")
+	log.Println("--->> Go...")
+	err := checkAndRemove(config.StartPath)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Println("<<--- Finished")
 	printStats()
 	presentation()
 }
 
-func checkAndRemove(dirPath string) {
+func checkAndRemove(dirPath string) error {
 	stats.FolderChecked++
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Println(err)
+		return err
 	}
 
 	printPath := true
@@ -58,6 +61,9 @@ func checkAndRemove(dirPath string) {
 		newPath := path.Join(dirPath, entry.Name())
 		if entry.IsDir() {
 			checkAndRemove(newPath)
+			// we don't need to check error here
+			// if internal folder is absent it means that it's deleted or renamed
+			// so we just skip this check
 			continue
 		}
 
@@ -67,7 +73,7 @@ func checkAndRemove(dirPath string) {
 			if config.RealClean {
 				err := os.Remove(newPath)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 					continue
 				}
 				stats.RemovedCount++
@@ -79,12 +85,13 @@ func checkAndRemove(dirPath string) {
 				}
 			}
 			if printPath {
-				fmt.Println(dirPath)
+				log.Println(dirPath)
 				printPath = false
 			}
-			fmt.Printf("   XXX: %s \n", entry.Name())
+			log.Printf("   XXX: %s \n", entry.Name())
 		}
 	}
+	return nil
 }
 
 func isSuspicious(file fs.DirEntry) bool {
