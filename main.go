@@ -2,26 +2,26 @@ package main
 
 import (
 	"fmt"
-	"io/fs"
 	"log"
 	"os"
 	"path"
-	"path/filepath"
-	"slices"
-	"strings"
+
+	"go-cleaner/checker"
+	"go-cleaner/configurator"
 )
 
 const dumpFilePath = "./dump_file.txt"
 
 var (
 	dumpFile *os.File
+	config   = &configurator.Config
 )
 
 func main() {
-	SetConfiguration()
+	configurator.Init()
 
 	if !config.IsReady {
-		log.Println("Not ready, check config file")
+		log.Println("Not ready, check and adjust 'cleaner_config.yml' file to ger ready")
 		return
 	}
 
@@ -43,7 +43,7 @@ func main() {
 		log.Fatalln(err)
 	}
 	log.Println("<<--- Finished")
-	printStats()
+	printStats(config.RealClean)
 	presentation()
 }
 
@@ -69,7 +69,7 @@ func checkAndRemove(dirPath string) error {
 
 		stats.FileChecked++
 
-		if isSuspicious(entry) {
+		if checker.IsExtMatch(entry, config.Exts) {
 			if config.RealClean {
 				err := os.Remove(newPath)
 				if err != nil {
@@ -92,15 +92,4 @@ func checkAndRemove(dirPath string) error {
 		}
 	}
 	return nil
-}
-
-func isSuspicious(file fs.DirEntry) bool {
-	ext := extension(file.Name())
-	return slices.Contains(config.Exts, ext)
-}
-
-func extension(fileName string) string {
-	ext := filepath.Ext(fileName)
-	ext = strings.TrimPrefix(ext, ".")
-	return strings.ToLower(ext)
 }

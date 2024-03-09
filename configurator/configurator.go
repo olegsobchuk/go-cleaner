@@ -1,8 +1,8 @@
-package main
+package configurator
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -10,9 +10,9 @@ import (
 
 const confFileName = "cleaner_config.yml"
 
-var config Config
+var Config Configuration
 
-type Config struct {
+type Configuration struct {
 	StartPath string   `yaml:"path"`
 	RealClean bool     `yaml:"real"`
 	IsReady   bool     `yaml:"ready"`
@@ -20,7 +20,7 @@ type Config struct {
 	FileNames []string `yaml:"files"`
 }
 
-func SetConfiguration() {
+func Init() {
 	if isConfExist() {
 		readConfFile()
 	} else {
@@ -31,24 +31,24 @@ func SetConfiguration() {
 func addConfigFile() {
 	confFile, err := os.Create(confFileName)
 	if err != nil {
-		fmt.Println("Create config error:", err)
+		log.Println("Create config error:", err)
 	}
 	defer confFile.Close()
 	setDefaultConf()
-	data, err := yaml.Marshal(config)
+	data, err := yaml.Marshal(Config)
 	if err != nil {
-		fmt.Println("YAML Marshaling err:", err)
+		log.Println("YAML Marshaling err:", err)
 	}
 	confFile.Write(data)
 }
 
 func setDefaultConf() {
-	config = Config{
+	Config = Configuration{
 		StartPath: ".",
 		RealClean: false,
 		IsReady:   false,
 		FileNames: []string{"~.ini"},
-		Exts:      []string{"lnk"},
+		Exts:      []string{"lnk", "ini", "bin", "tmp"},
 	}
 }
 
@@ -60,7 +60,7 @@ func isConfExist() bool {
 func readConfFile() {
 	data, err := os.ReadFile(confFileName)
 	if err != nil {
-		fmt.Println("Read conf file err:", err)
+		log.Println("Read conf file err:", err)
 	}
-	yaml.Unmarshal(data, &config)
+	yaml.Unmarshal(data, &Config)
 }
