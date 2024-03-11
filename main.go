@@ -69,6 +69,30 @@ func checkAndRemove(dirPath string) error {
 
 		stats.FileChecked++
 
+		if checker.IsNameMatch(entry.Name(), config.FileNames) {
+			if config.RealClean {
+				if config.RealClean {
+					err := os.Remove(newPath)
+					if err != nil {
+						log.Println(err)
+						continue
+					}
+					stats.RemovedCount++
+				} else {
+					stats.FoundCount++
+					_, err = dumpFile.WriteString(fmt.Sprintf("%s\n", newPath))
+					if err != nil {
+						log.Println("Write to file error:", err)
+					}
+				}
+				if printPath {
+					log.Println(dirPath)
+					printPath = false
+				}
+				log.Printf("   XXX: %s \n", entry.Name())
+			}
+		}
+
 		if checker.IsExtMatch(entry, config.Exts) {
 			if config.RealClean {
 				err := os.Remove(newPath)
