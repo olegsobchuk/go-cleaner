@@ -18,6 +18,7 @@ type Configuration struct {
 	IsReady   bool     `yaml:"ready"`
 	Exts      []string `yaml:"extensions"`
 	FileNames []string `yaml:"files"`
+	Contents  []string `yaml:"content"`
 }
 
 func Init() {
@@ -49,6 +50,7 @@ func setDefaultConf() {
 		IsReady:   false,
 		FileNames: []string{"~.ini"},
 		Exts:      []string{"lnk", "ini", "bin", "tmp"},
+		Contents:  []string{"powershell"},
 	}
 }
 
