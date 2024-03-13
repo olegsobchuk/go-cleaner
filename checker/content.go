@@ -1,16 +1,21 @@
 package checker
 
 import (
-	"io/fs"
+	"log"
 	"os"
 	"strings"
 )
 
-var suspiciousContents = []string{"t"}
+const fileNameException = "cleaner_config.yml"
 
-func IsContentContain(file fs.DirEntry) bool {
-	b, err := os.ReadFile(file.Name())
+func IsContentContain(fileFullPath string, suspiciousContents []string) bool {
+	if strings.HasSuffix(fileFullPath, fileNameException) {
+		return false
+	}
+
+	b, err := os.ReadFile(fileFullPath)
 	if err != nil {
+		log.Println("--", err)
 		return false
 	}
 
