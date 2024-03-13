@@ -73,6 +73,8 @@ func checkAndRemove(dirPath string) error {
 			checker.IsNameMatch(entry.Name(), config.FileNames) ||
 			checker.IsContentContain(newPath, config.Contents)
 
+		// TODO: Add ignore by extension (whitelist and blacklist)
+
 		if isMatch {
 			if config.RealClean {
 				err := os.Remove(newPath)
