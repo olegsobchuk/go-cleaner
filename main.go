@@ -69,11 +69,14 @@ func checkAndRemove(dirPath string) error {
 
 		stats.FileChecked++
 
-		isMatch := checker.IsExtMatch(entry, config.Exts) ||
+		// Ignore file by WhiteList extension
+		if checker.IsExtMatch(entry, config.Exts.WhiteList) {
+			return nil
+		}
+
+		isMatch := checker.IsExtMatch(entry, config.Exts.BlackList) ||
 			checker.IsNameMatch(entry.Name(), config.FileNames) ||
 			checker.IsContentContain(newPath, config.Contents)
-
-		// TODO: Add ignore by extension (whitelist and blacklist)
 
 		if isMatch {
 			if config.RealClean {
