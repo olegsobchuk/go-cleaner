@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"slices"
 
 	"gopkg.in/yaml.v3"
 )
@@ -12,8 +13,9 @@ const confFileName = "cleaner_config.yml"
 
 var (
 	defaultBlackList     = []string{"lnk", "ini", "bin", "tmp"}
-	defaultWhiteListDocs = []string{"doc", "docx", "xls", "xlsx"}
-	defaultWhiteListImgs = []string{"png", "jpg"}
+	defaultWhiteListDocs = []string{"doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"}
+	defaultWhiteListImgs = []string{"png", "png", "jpg", "jpeg", "raw"}
+	defaultWhiteListExts = slices.Concat(defaultWhiteListDocs, defaultWhiteListImgs)
 	Config               Configuration
 )
 
@@ -62,7 +64,7 @@ func setDefaultConf() {
 		IsReady:   false,
 		FileNames: []string{"~.ini"},
 		Exts: Exts{
-			WhiteList: append(defaultWhiteListDocs, defaultWhiteListImgs...),
+			WhiteList: defaultWhiteListExts,
 			BlackList: defaultBlackList,
 		},
 		Contents: []string{"powershell"},
