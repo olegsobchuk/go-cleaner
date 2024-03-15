@@ -12,18 +12,25 @@ import (
 const confFileName = "cleaner_config.yml"
 
 var (
-	defaultBlackList     = []string{"lnk", "ini", "bin", "tmp"}
-	defaultWhiteListDocs = []string{"doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"}
-	defaultWhiteListImgs = []string{"png", "png", "jpg", "jpeg", "raw"}
-	defaultWhiteListExts = slices.Concat(defaultWhiteListDocs, defaultWhiteListImgs)
-	Config               Configuration
+	defaultBlackList      = ExtList{"lnk", "ini2", "bin", "tmp"}
+	defaultWhiteListDocs  = ExtList{"doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"}
+	defaultWhiteListImgs  = ExtList{"png", "png", "jpg", "jpeg", "raw"}
+	defaultWhiteListExts  = slices.Concat(defaultWhiteListDocs, defaultWhiteListImgs)
+	defaultBlackListFiles = FileList{"~.ini2"}
+	Config                Configuration
 )
 
 type ExtList []string
+type FileList []string
 
 type Exts struct {
 	WhiteList ExtList `yaml:"whitelist"`
 	BlackList ExtList `yaml:"blacklist"`
+}
+
+type Files struct {
+	WhiteList FileList `yaml:"whitelist"`
+	BlackList FileList `yaml:"blacklist"`
 }
 
 type Configuration struct {
@@ -31,7 +38,7 @@ type Configuration struct {
 	RealClean bool     `yaml:"real"`
 	IsReady   bool     `yaml:"ready"`
 	Exts      Exts     `yaml:"extensions"`
-	FileNames []string `yaml:"files"`
+	Files     Files    `yaml:"files"`
 	Contents  []string `yaml:"content"`
 }
 
@@ -62,7 +69,9 @@ func setDefaultConf() {
 		StartPath: ".",
 		RealClean: false,
 		IsReady:   false,
-		FileNames: []string{"~.ini"},
+		Files: Files{
+			BlackList: defaultBlackListFiles,
+		},
 		Exts: Exts{
 			WhiteList: defaultWhiteListExts,
 			BlackList: defaultBlackList,

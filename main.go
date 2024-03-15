@@ -75,7 +75,7 @@ func checkAndRemove(dirPath string) error {
 		}
 
 		isMatch := checker.IsExtMatch(entry, config.Exts.BlackList) ||
-			checker.IsNameMatch(entry.Name(), config.FileNames) ||
+			checker.IsNameMatch(entry.Name(), config.Files.BlackList) ||
 			checker.IsContentContain(newPath, config.Contents)
 
 		if isMatch {
