@@ -1,6 +1,9 @@
 package main
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 const version = "2.0.0"
 
@@ -13,9 +16,9 @@ type Stats struct {
 	RemovedCount  uint16
 }
 
-func presentation() {
+func representation() string {
 	text := "Version: %s * Developped by Oleh Sobchuk tel: 0730240643\n"
-	log.Printf(text, version)
+	return fmt.Sprintf(text, version)
 }
 
 func printStats(realClean bool) {

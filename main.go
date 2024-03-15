@@ -31,6 +31,8 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
+		dumpFile.WriteString(representation())
+
 		defer dumpFile.Close()
 		defer dumpFile.Sync()
 	}
@@ -44,7 +46,7 @@ func main() {
 	}
 	log.Println("<<--- Finished")
 	printStats(config.RealClean)
-	presentation()
+	log.Println(representation())
 }
 
 func checkAndRemove(dirPath string) error {
@@ -88,11 +90,14 @@ func checkAndRemove(dirPath string) error {
 				stats.RemovedCount++
 			} else {
 				stats.FoundCount++
-				_, err = dumpFile.WriteString(fmt.Sprintf("%s\n", newPath))
-				if err != nil {
-					log.Println("Write to file error:", err)
-				}
 			}
+
+			// write statistic info to file
+			_, err = dumpFile.WriteString(fmt.Sprintf("%s\n", newPath))
+			if err != nil {
+				log.Println("Write to file error:", err)
+			}
+
 			if printPath {
 				log.Println(dirPath)
 				printPath = false
