@@ -2,7 +2,7 @@ package main
 
 import "log"
 
-const version = "2.2.0"
+const version = "2.0.0"
 
 var stats Stats
 
