@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 )
 
-const version = "2.0.0"
+const version = "2.0.1"
 
 var stats Stats
 
@@ -14,6 +15,17 @@ type Stats struct {
 	FileChecked   uint16
 	FoundCount    uint16
 	RemovedCount  uint16
+}
+
+func createDumpFile() {
+	var err error
+	dumpFile, err = os.Create(dumpFilePath)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer dumpFile.Close()
+	defer dumpFile.Sync()
 }
 
 func representation() string {

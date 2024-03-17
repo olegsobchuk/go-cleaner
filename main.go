@@ -25,18 +25,9 @@ func main() {
 		return
 	}
 
-	if !config.RealClean {
-		var err error
-		dumpFile, err = os.Create(dumpFilePath)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		dumpFile.WriteString(representation())
+	createDumpFile()
 
-		defer dumpFile.Close()
-		defer dumpFile.Sync()
-	}
-
+	dumpFile.WriteString(representation())
 	log.Printf("Real mode %t \n", config.RealClean)
 
 	log.Println("--->> Go...")
