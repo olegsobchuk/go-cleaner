@@ -17,15 +17,21 @@ type Stats struct {
 }
 
 func representation() string {
-	text := "Version: %s * Developped by Oleh Sobchuk tel: 0730240643\n"
+	text := "Version: %s * Developped by Oleh Sobchuk tel: 0730240643\n\n"
 	return fmt.Sprintf(text, version)
 }
 
 func printStats(realClean bool) {
-	log.Printf("\nChecked: %d folder(s), %d file(s)\n", stats.FileChecked, stats.FileChecked)
+	totalStatInfo := fmt.Sprintf("\nChecked: %d folder(s), %d file(s)\n", stats.FolderChecked, stats.FileChecked)
+	var processedFilesStat string
+
+	dumpFile.WriteString(totalStatInfo)
+	log.Println(totalStatInfo)
 	if realClean {
-		log.Printf("\nRemoved: %d file(s)\n\n", stats.RemovedCount)
+		processedFilesStat = fmt.Sprintf("\nRemoved: %d file(s)\n\n", stats.RemovedCount)
 	} else {
-		log.Printf("\nFound: %d file(s)\n\n", stats.FoundCount)
+		processedFilesStat = fmt.Sprintf("\nFound: %d file(s)\n\n", stats.FoundCount)
 	}
+	dumpFile.WriteString(processedFilesStat)
+	log.Println(processedFilesStat)
 }

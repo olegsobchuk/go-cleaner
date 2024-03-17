@@ -10,6 +10,5 @@ func IsSizeOver(filePath string, limit int64) bool {
 	if err != nil {
 		log.Println("Size error -", filePath, err)
 	}
-	log.Println("l", limit, "f", filePath, info.Size())
 	return info.Size() > limit
 }

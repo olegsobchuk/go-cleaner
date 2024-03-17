@@ -13,9 +13,8 @@ import (
 const dumpFilePath = "./dump_file.txt"
 
 var (
-	dumpFile  *os.File
-	config    = &configurator.Config
-	printPath = true
+	dumpFile *os.File
+	config   = &configurator.Config
 )
 
 func main() {
@@ -51,6 +50,7 @@ func main() {
 }
 
 func checkAndRemove(dirPath string) error {
+	printPath := true
 	stats.FolderChecked++
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
@@ -85,18 +85,13 @@ func checkAndRemove(dirPath string) error {
 		if isMatch {
 			catchFile(fullFilePath)
 
-			// write statistic info to file
-			_, err := dumpFile.WriteString(fmt.Sprintf("%s\n", fullFilePath))
-			if err != nil {
-				log.Println("Write to file error:", err)
-			}
-
-			// TODO: print this to dump file
 			if printPath {
+				dumpFile.WriteString(fmt.Sprintln(dirPath))
 				log.Println(dirPath)
 				printPath = false
 			}
-			log.Printf("   XXX: %s \n", entry.Name())
+			dumpFile.WriteString(fmt.Sprintf("   X: %s \n", entry.Name()))
+			log.Printf("   X: %s \n", entry.Name())
 		}
 	}
 	return nil
