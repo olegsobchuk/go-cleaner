@@ -4,20 +4,46 @@ import (
 	"errors"
 	"log"
 	"os"
+	"slices"
 
 	"gopkg.in/yaml.v3"
 )
 
 const confFileName = "cleaner_config.yml"
 
-var Config Configuration
+var (
+	defaultStartPath              = "."
+	defaultBlackList              = ExtList{"lnk", "ini2", "bin", "tmp"}
+	defaultWhiteListDocs          = ExtList{"doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"}
+	defaultWhiteListImgs          = ExtList{"png", "png", "jpg", "jpeg", "raw"}
+	defaultWhiteListExts          = slices.Concat(defaultWhiteListDocs, defaultWhiteListImgs)
+	defaultBlackListFiles         = FileList{"~.ini2"}
+	defaultSizeLimit        int64 = 5_000_000
+	defaultContentBlacklist       = []string{"powershell"}
+	Config                  Configuration
+)
+
+type ExtList []string
+type FileList []string
+
+type Exts struct {
+	WhiteList ExtList `yaml:"whitelist"`
+	BlackList ExtList `yaml:"blacklist"`
+}
+
+type Files struct {
+	WhiteList FileList `yaml:"whitelist"`
+	BlackList FileList `yaml:"blacklist"`
+}
 
 type Configuration struct {
 	StartPath string   `yaml:"path"`
 	RealClean bool     `yaml:"real"`
 	IsReady   bool     `yaml:"ready"`
-	Exts      []string `yaml:"extensions"`
-	FileNames []string `yaml:"files"`
+	SizeLimit int64    `yaml:"size"`
+	Exts      Exts     `yaml:"extensions"`
+	Files     Files    `yaml:"files"`
+	Contents  []string `yaml:"content"`
 }
 
 func Init() {
@@ -44,11 +70,18 @@ func addConfigFile() {
 
 func setDefaultConf() {
 	Config = Configuration{
-		StartPath: ".",
+		StartPath: defaultStartPath,
 		RealClean: false,
 		IsReady:   false,
-		FileNames: []string{"~.ini"},
-		Exts:      []string{"lnk", "ini", "bin", "tmp"},
+		SizeLimit: defaultSizeLimit,
+		Files: Files{
+			BlackList: defaultBlackListFiles,
+		},
+		Exts: Exts{
+			WhiteList: defaultWhiteListExts,
+			BlackList: defaultBlackList,
+		},
+		Contents: defaultContentBlacklist,
 	}
 }
 

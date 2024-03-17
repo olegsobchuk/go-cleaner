@@ -31,6 +31,8 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
+		dumpFile.WriteString(representation())
+
 		defer dumpFile.Close()
 		defer dumpFile.Sync()
 	}
@@ -44,10 +46,11 @@ func main() {
 	}
 	log.Println("<<--- Finished")
 	printStats(config.RealClean)
-	presentation()
+	log.Println(representation())
 }
 
 func checkAndRemove(dirPath string) error {
+	printPath := true
 	stats.FolderChecked++
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
@@ -55,12 +58,10 @@ func checkAndRemove(dirPath string) error {
 		return err
 	}
 
-	printPath := true
-
 	for _, entry := range entries {
-		newPath := path.Join(dirPath, entry.Name())
+		fullFilePath := path.Join(dirPath, entry.Name())
 		if entry.IsDir() {
-			checkAndRemove(newPath)
+			checkAndRemove(fullFilePath)
 			// we don't need to check error here
 			// if internal folder is absent it means that it's deleted or renamed
 			// so we just skip this check
@@ -69,27 +70,42 @@ func checkAndRemove(dirPath string) error {
 
 		stats.FileChecked++
 
-		if checker.IsExtMatch(entry, config.Exts) {
-			if config.RealClean {
-				err := os.Remove(newPath)
-				if err != nil {
-					log.Println(err)
-					continue
-				}
-				stats.RemovedCount++
-			} else {
-				stats.FoundCount++
-				_, err = dumpFile.WriteString(fmt.Sprintf("%s\n", newPath))
-				if err != nil {
-					log.Println("Write to file error:", err)
-				}
-			}
+		// Ignore file by WhiteList extension or Size limit
+		beIgored := checker.IsExtMatch(entry, config.Exts.WhiteList) ||
+			checker.IsSizeOver(fullFilePath, config.SizeLimit)
+
+		if beIgored {
+			continue
+		}
+
+		isMatch := checker.IsExtMatch(entry, config.Exts.BlackList) ||
+			checker.IsNameMatch(entry.Name(), config.Files.BlackList) ||
+			checker.IsContentContain(fullFilePath, config.Contents)
+
+		if isMatch {
+			catchFile(fullFilePath)
+
 			if printPath {
+				dumpFile.WriteString(fmt.Sprintln(dirPath))
 				log.Println(dirPath)
 				printPath = false
 			}
-			log.Printf("   XXX: %s \n", entry.Name())
+			dumpFile.WriteString(fmt.Sprintf("   X: %s \n", entry.Name()))
+			log.Printf("   X: %s \n", entry.Name())
 		}
 	}
 	return nil
+}
+
+func catchFile(filePath string) {
+	if config.RealClean {
+		err := os.Remove(filePath)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		stats.RemovedCount++
+	} else {
+		stats.FoundCount++
+	}
 }
