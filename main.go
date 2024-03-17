@@ -70,9 +70,12 @@ func checkAndRemove(dirPath string) error {
 
 		stats.FileChecked++
 
-		// Ignore file by WhiteList extension
-		if checker.IsExtMatch(entry, config.Exts.WhiteList) {
-			return nil
+		// Ignore file by WhiteList extension or Size limit
+		beIgored := checker.IsExtMatch(entry, config.Exts.WhiteList) ||
+			checker.IsSizeOver(fullFilePath, config.SizeLimit)
+
+		if beIgored {
+			continue
 		}
 
 		isMatch := checker.IsExtMatch(entry, config.Exts.BlackList) ||
@@ -94,7 +97,6 @@ func checkAndRemove(dirPath string) error {
 				printPath = false
 			}
 			log.Printf("   XXX: %s \n", entry.Name())
-
 		}
 	}
 	return nil

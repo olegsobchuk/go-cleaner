@@ -12,12 +12,15 @@ import (
 const confFileName = "cleaner_config.yml"
 
 var (
-	defaultBlackList      = ExtList{"lnk", "ini2", "bin", "tmp"}
-	defaultWhiteListDocs  = ExtList{"doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"}
-	defaultWhiteListImgs  = ExtList{"png", "png", "jpg", "jpeg", "raw"}
-	defaultWhiteListExts  = slices.Concat(defaultWhiteListDocs, defaultWhiteListImgs)
-	defaultBlackListFiles = FileList{"~.ini2"}
-	Config                Configuration
+	defaultStartPath              = "."
+	defaultBlackList              = ExtList{"lnk", "ini2", "bin", "tmp"}
+	defaultWhiteListDocs          = ExtList{"doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"}
+	defaultWhiteListImgs          = ExtList{"png", "png", "jpg", "jpeg", "raw"}
+	defaultWhiteListExts          = slices.Concat(defaultWhiteListDocs, defaultWhiteListImgs)
+	defaultBlackListFiles         = FileList{"~.ini2"}
+	defaultSizeLimit        int64 = 5_000_000
+	defaultContentBlacklist       = []string{"powershell"}
+	Config                  Configuration
 )
 
 type ExtList []string
@@ -37,6 +40,7 @@ type Configuration struct {
 	StartPath string   `yaml:"path"`
 	RealClean bool     `yaml:"real"`
 	IsReady   bool     `yaml:"ready"`
+	SizeLimit int64    `yaml:"size"`
 	Exts      Exts     `yaml:"extensions"`
 	Files     Files    `yaml:"files"`
 	Contents  []string `yaml:"content"`
@@ -66,9 +70,10 @@ func addConfigFile() {
 
 func setDefaultConf() {
 	Config = Configuration{
-		StartPath: ".",
+		StartPath: defaultStartPath,
 		RealClean: false,
 		IsReady:   false,
+		SizeLimit: defaultSizeLimit,
 		Files: Files{
 			BlackList: defaultBlackListFiles,
 		},
@@ -76,7 +81,7 @@ func setDefaultConf() {
 			WhiteList: defaultWhiteListExts,
 			BlackList: defaultBlackList,
 		},
-		Contents: []string{"powershell"},
+		Contents: defaultContentBlacklist,
 	}
 }
 
