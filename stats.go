@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const version = "2.0.1"
+const version = "2.0.2"
 
 var stats Stats
 
@@ -23,9 +23,6 @@ func createDumpFile() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	defer dumpFile.Close()
-	defer dumpFile.Sync()
 }
 
 func representation() string {

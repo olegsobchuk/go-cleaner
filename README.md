@@ -2,8 +2,16 @@
 
 ## To create executable file
 
+### Windows
+
 ``` go
 env GOOS=windows GOARCH=amd64 go build -o cleaner_ver.exe
+```
+
+### Linux
+
+``` go
+env GOOS=linux GOARCH=amd64 go build -o cleaner_ver
 ```
 
 ## How to use

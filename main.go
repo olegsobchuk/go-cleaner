@@ -26,12 +26,17 @@ func main() {
 	}
 
 	createDumpFile()
+	defer dumpFile.Sync()
+	defer dumpFile.Close()
 
-	dumpFile.WriteString(representation())
+	_, err := dumpFile.WriteString(representation())
+	if err != nil {
+		log.Println(err)
+	}
 	log.Printf("Real mode %t \n", config.RealClean)
 
 	log.Println("--->> Go...")
-	err := checkAndRemove(config.StartPath)
+	err = checkAndRemove(config.StartPath)
 	if err != nil {
 		log.Fatalln(err)
 	}
