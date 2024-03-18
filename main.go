@@ -26,7 +26,6 @@ func main() {
 	}
 
 	createDumpFile()
-	defer dumpFile.Sync()
 	defer dumpFile.Close()
 
 	_, err := dumpFile.WriteString(representation())
@@ -90,6 +89,7 @@ func checkAndRemove(dirPath string) error {
 			log.Printf("   X: %s \n", entry.Name())
 		}
 	}
+	dumpFile.Sync()
 	return nil
 }
 
