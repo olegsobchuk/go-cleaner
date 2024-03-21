@@ -20,8 +20,11 @@ func IsContentContain(fileFullPath string, suspiciousContents []string) bool {
 	}
 
 	fileString := strings.ToLower(string(b))
+	fileString = strings.ReplaceAll(fileString, "\x00", "")
 	for _, str := range suspiciousContents {
-		if strings.Contains(fileString, str) {
+		lowerStr := strings.ToLower(str)
+
+		if strings.Contains(fileString, lowerStr) {
 			return true
 		}
 	}
