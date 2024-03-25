@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 )
 
 func checkAndRemove(dirPath string) error {
@@ -17,12 +18,14 @@ func checkAndRemove(dirPath string) error {
 		return err
 	}
 
+	// check dir-s in the end
+	sort.Slice(entries, func(i, j int) bool { return entries[j].IsDir() })
 	for _, entry := range entries {
 		fullFilePath := path.Join(dirPath, entry.Name())
 		if entry.IsDir() {
 			checkAndRemove(fullFilePath)
 			// we don't need to check error here
-			// if internal folder is absent it means that it's deleted or renamed
+			// if internal folder is absent it means that it's been deleted or renamed
 			// so we just skip this check
 			continue
 		}
@@ -31,7 +34,7 @@ func checkAndRemove(dirPath string) error {
 
 		// Ignore file by WhiteList extension or Size limit
 		beIgored := checker.IsExtMatch(entry, config.Exts.WhiteList) ||
-			checker.IsSizeOver(fullFilePath, config.SizeLimit)
+			checker.IsSizeOver(fullFilePath, config.SizeConfig.Threshold)
 
 		if beIgored {
 			continue
@@ -39,6 +42,7 @@ func checkAndRemove(dirPath string) error {
 
 		isMatch := checker.IsExtMatch(entry, config.Exts.BlackList) ||
 			checker.IsNameMatch(entry.Name(), config.Files.BlackList) ||
+			checker.IsZero(fullFilePath, config.SizeConfig.CatchZero) ||
 			checker.IsContentContain(fullFilePath, config.Contents)
 
 		if isMatch {
