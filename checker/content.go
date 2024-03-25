@@ -13,13 +13,13 @@ func IsContentContain(fileFullPath string, suspiciousContents []string) bool {
 		return false
 	}
 
-	b, err := os.ReadFile(fileFullPath)
+	fileString, err := readFileToString(fileFullPath)
 	if err != nil {
 		log.Println("--", err)
 		return false
 	}
 
-	fileString := strings.ToLower(string(b))
+	fileString = strings.ToLower(fileString)
 	fileString = strings.ReplaceAll(fileString, "\x00", "")
 	for _, str := range suspiciousContents {
 		lowerStr := strings.ToLower(str)
@@ -29,4 +29,12 @@ func IsContentContain(fileFullPath string, suspiciousContents []string) bool {
 		}
 	}
 	return false
+}
+
+func readFileToString(path string) (string, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }

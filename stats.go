@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const version = "2.0.3"
+const version = "2.0.4"
 
 var stats Stats
 
