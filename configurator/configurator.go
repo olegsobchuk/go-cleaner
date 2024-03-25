@@ -36,14 +36,19 @@ type Files struct {
 	BlackList FileList `yaml:"blacklist"`
 }
 
+type SizeConfig struct {
+	Threshold int64 `yaml:"ignore_more"`
+	CatchZero bool  `yaml:"catch_zero"`
+}
+
 type Configuration struct {
-	StartPath string   `yaml:"path"`
-	RealClean bool     `yaml:"real"`
-	IsReady   bool     `yaml:"ready"`
-	SizeLimit int64    `yaml:"size"`
-	Exts      Exts     `yaml:"extensions"`
-	Files     Files    `yaml:"files"`
-	Contents  []string `yaml:"content"`
+	StartPath  string     `yaml:"path"`
+	RealClean  bool       `yaml:"real"`
+	IsReady    bool       `yaml:"ready"`
+	SizeConfig SizeConfig `yaml:"size"`
+	Exts       Exts       `yaml:"extensions"`
+	Files      Files      `yaml:"files"`
+	Contents   []string   `yaml:"content"`
 }
 
 func Init() {
@@ -73,7 +78,10 @@ func setDefaultConf() {
 		StartPath: defaultStartPath,
 		RealClean: false,
 		IsReady:   false,
-		SizeLimit: defaultSizeLimit,
+		SizeConfig: SizeConfig{
+			Threshold: defaultSizeLimit,
+			CatchZero: true,
+		},
 		Files: Files{
 			BlackList: defaultBlackListFiles,
 		},
