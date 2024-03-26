@@ -8,6 +8,15 @@ import (
 
 const fileNameException = "cleaner_config.yml"
 
+// needed this implementattion for tests
+var readFileToString = func(path string) (string, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
 func IsContentContain(fileFullPath string, suspiciousContents []string) bool {
 	if strings.HasSuffix(fileFullPath, fileNameException) {
 		return false
@@ -21,6 +30,7 @@ func IsContentContain(fileFullPath string, suspiciousContents []string) bool {
 
 	fileString = strings.ToLower(fileString)
 	fileString = strings.ReplaceAll(fileString, "\x00", "")
+	log.Println(fileString)
 	for _, str := range suspiciousContents {
 		lowerStr := strings.ToLower(str)
 
@@ -29,12 +39,4 @@ func IsContentContain(fileFullPath string, suspiciousContents []string) bool {
 		}
 	}
 	return false
-}
-
-func readFileToString(path string) (string, error) {
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
 }
