@@ -9,7 +9,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const confFileName = "cleaner_config.yml"
+const (
+	confFileName           = "cleaner_config.yml"
+	defaultStartPath       = "."
+	defaultSizeLimit int64 = 5_000_000
+)
 
 var (
 	Config Configuration
@@ -67,14 +71,12 @@ func addConfigFile() {
 
 func setDefaultConf() {
 	var (
-		defaultStartPath              = "."
-		defaultBlackList              = ExtList{"lnk", "ini2", "bin", "tmp"}
-		defaultWhiteListDocs          = ExtList{"doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"}
-		defaultWhiteListImgs          = ExtList{"png", "jpg", "jpeg", "raw"}
-		defaultWhiteListExts          = slices.Concat(defaultWhiteListDocs, defaultWhiteListImgs)
-		defaultBlackListFiles         = FileList{"~.ini2"}
-		defaultSizeLimit        int64 = 5_000_000
-		defaultContentBlacklist       = []string{"powershell"}
+		defaultBlackList        = ExtList{"lnk", "ini2", "bin", "tmp"}
+		defaultWhiteListDocs    = ExtList{"doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"}
+		defaultWhiteListImgs    = ExtList{"png", "jpg", "jpeg", "raw"}
+		defaultWhiteListExts    = slices.Concat(defaultWhiteListDocs, defaultWhiteListImgs)
+		defaultBlackListFiles   = FileList{"~.ini2"}
+		defaultContentBlacklist = []string{"powershell"}
 	)
 
 	Config = Configuration{
