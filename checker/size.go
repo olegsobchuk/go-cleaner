@@ -15,6 +15,7 @@ func IsZero(filePath string, toCheck bool) bool {
 	}
 	return false
 }
+
 func size(filePath string) int64 {
 	info, err := os.Stat(filePath)
 	if err != nil {
