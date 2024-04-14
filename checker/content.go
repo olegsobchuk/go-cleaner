@@ -30,7 +30,6 @@ func IsContentContain(fileFullPath string, suspiciousContents []string) bool {
 
 	fileString = strings.ToLower(fileString)
 	fileString = strings.ReplaceAll(fileString, "\x00", "")
-	log.Println(fileString)
 	for _, str := range suspiciousContents {
 		lowerStr := strings.ToLower(str)
 
