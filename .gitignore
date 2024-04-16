@@ -1,4 +1,8 @@
-test/
+# IDE
 .vscode/
+.idea/
+
+# local testing
+test/
 cleaner_config.yml
 dump_file.txt
