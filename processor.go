@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"go-cleaner/checker"
+	"go-cleaner/configurator"
 	"log"
 	"os"
 	"path"
 	"sort"
 )
 
-func checkAndRemove(dirPath string) error {
+func checkAndRemove(dirPath string, config *configurator.Configuration) error {
 	printPath := true
 	stats.FolderChecked++
 	entries, err := os.ReadDir(dirPath)
@@ -23,7 +24,7 @@ func checkAndRemove(dirPath string) error {
 	for _, entry := range entries {
 		fullFilePath := path.Join(dirPath, entry.Name())
 		if entry.IsDir() {
-			checkAndRemove(fullFilePath)
+			checkAndRemove(fullFilePath, config)
 			// we don't need to check error here
 			// if internal folder is absent it means that it's been deleted or renamed
 			// so we just skip this check
@@ -46,7 +47,7 @@ func checkAndRemove(dirPath string) error {
 			checker.IsContentContain(fullFilePath, config.Contents)
 
 		if isMatch {
-			catchFile(fullFilePath)
+			catchFile(fullFilePath, config)
 
 			if printPath {
 				dumpFile.WriteString(fmt.Sprintln(dirPath))
@@ -61,7 +62,7 @@ func checkAndRemove(dirPath string) error {
 	return nil
 }
 
-func catchFile(filePath string) {
+func catchFile(filePath string, config *configurator.Configuration) {
 	if config.RealClean {
 		err := os.Remove(filePath)
 		if err != nil {

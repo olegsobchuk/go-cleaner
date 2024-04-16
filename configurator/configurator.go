@@ -2,7 +2,7 @@ package configurator
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"os"
 	"slices"
 
@@ -10,13 +10,9 @@ import (
 )
 
 const (
-	confFileName           = "cleaner_config.yml"
+	ConfigFileName         = "cleaner_config.yml"
 	defaultStartPath       = "."
 	defaultSizeLimit int64 = 5_000_000
-)
-
-var (
-	Config Configuration
 )
 
 type ExtList []string
@@ -47,29 +43,34 @@ type Configuration struct {
 	Contents   []string   `yaml:"content"`
 }
 
-func Init() {
-	if isConfExist() {
-		readConfFile()
-	} else {
-		addConfigFile()
-	}
+type Configurator struct {
+	os OsWrapper
 }
 
-func addConfigFile() {
-	confFile, err := os.Create(confFileName)
-	if err != nil {
-		log.Println("Create config error:", err)
-	}
-	defer confFile.Close()
-	setDefaultConf()
-	data, err := yaml.Marshal(Config)
-	if err != nil {
-		log.Println("YAML Marshaling err:", err)
-	}
-	confFile.Write(data)
+func NewConfigurator(os OsWrapper) Configurator {
+	return Configurator{os}
 }
 
-func setDefaultConf() {
+func (c Configurator) GetConfiguration() (config *Configuration, fileExists bool, err error) {
+	if c.isFilePresent(ConfigFileName) {
+		config, err := c.readConfigurationFromFile(ConfigFileName)
+		return config, true, err
+	}
+
+	return getDefaultConfiguration(), false, nil
+}
+
+func (c Configurator) SaveConfigurationToFile(config *Configuration, filePath string) error {
+	yamlBytes, err := yaml.Marshal(config)
+	if err != nil {
+		return fmt.Errorf("failed to convert default configuration to YAML: %w", err)
+	}
+
+	permissions := os.FileMode(0666) // everybody may read and write the file
+	return c.os.WriteFile(filePath, yamlBytes, permissions)
+}
+
+func getDefaultConfiguration() *Configuration {
 	var (
 		defaultBlackList        = ExtList{"lnk", "ini2", "bin", "tmp"}
 		defaultWhiteListDocs    = ExtList{"doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"}
@@ -79,7 +80,7 @@ func setDefaultConf() {
 		defaultContentBlacklist = []string{"powershell"}
 	)
 
-	Config = Configuration{
+	return &Configuration{
 		StartPath: defaultStartPath,
 		RealClean: false,
 		IsReady:   false,
@@ -98,15 +99,19 @@ func setDefaultConf() {
 	}
 }
 
-func isConfExist() bool {
-	_, err := os.Stat(confFileName)
+func (c Configurator) isFilePresent(filePath string) bool {
+	_, err := c.os.Stat(filePath)
 	return !errors.Is(err, os.ErrNotExist)
 }
 
-func readConfFile() {
-	data, err := os.ReadFile(confFileName)
+func (c Configurator) readConfigurationFromFile(filePath string) (*Configuration, error) {
+	fileContent, err := c.os.ReadFile(filePath)
 	if err != nil {
-		log.Println("Read conf file err:", err)
+		return nil, fmt.Errorf("failed to read configuration file: %w", err)
 	}
-	yaml.Unmarshal(data, &Config)
+
+	var config Configuration
+	err = yaml.Unmarshal(fileContent, &config)
+
+	return &config, err
 }
